@@ -1,9 +1,10 @@
 from bs4 import BeautifulSoup
 from collections import namedtuple
+from urllib.request import Request, urlopen
 import logging
 import requests
 
-from .models import Offer
+# from .models import Offer
 
 
 class Parser:
@@ -14,11 +15,20 @@ class Parser:
     PARAMS = namedtuple('Params', 'kw wp kw_sep')
     qr_params = PARAMS(';kw', ';wp', '-x44-')
 
+    headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+               'Content-Type': 'application/x-www-form-urlencoded',
+               'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'}
+
+
     def parse_url(self, data):
         soup = BeautifulSoup(data, features="html.parser")
-        elements = soup.findAll("li", class_="results__list-container-item")
+        # elements = soup.findAll("li", class_="results__list-container-item")
+        elements = soup.find_all("li", "results__list-container-item")
+        print(len(elements))
+        # print(elements)
 
         for offer in elements:
+            # print(offer)
             offer_name = offer.find("h3", class_="offer-details__title")
             company = offer.find("p", class_="offer-company")
             publication_date = offer.find("span", class_="offer-actions__date")
@@ -29,14 +39,14 @@ class Parser:
             publication_date = self.remove_empty_lines_from_html(publication_date)
             offer_text = self.remove_empty_lines_from_html(offer_text)
 
-            Offer.objects.get_or_create(
-                name=offer_name,
-                company=company,
-                offer_text=offer_text,
-                publication_date=publication_date.split(':')[-1],
-            )
-
-            print(f"name : {offer_name}, company : {company}, publication: {publication_date.split(':')[-1]}, text : {offer_text}")
+            # Offer.objects.get_or_create(
+            #     name=offer_name,
+            #     company=company,
+            #     offer_text=offer_text,
+            #     publication_date=publication_date.split(':')[-1],
+            # )
+            # print(f"NAME : {offer_name}")
+            # print(f"name : {offer_name}, company : {company}, publication: {publication_date.split(':')[-1]}, text : {offer_text}")
         return elements
 
     def compose_url(self, city, jobs):
@@ -52,8 +62,12 @@ class Parser:
 
     def get_data_from_pracuj_pl(self, city, *jobs):
         url = self.compose_url(city, jobs)
+
         print(f"URL : {url}")
-        r = requests.get(url=url)
+        req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        webpage = urlopen(req).read()
+        print(webpage)
+        r = requests.post(url=url, headers=self.headers)
         readable_data = self.parse_url(r.content)
         return readable_data
 
@@ -62,3 +76,6 @@ class Parser:
         return formated
 
 
+parser = Parser()
+jobs = ["python"]
+parser.get_data_from_pracuj_pl("poznan", *jobs)

@@ -10,7 +10,7 @@ class JobsViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    # queryset = Offer.objects.all()
+    queryset = Offer.objects.all()
     serializer_class = OfferSerializer
 
     def list(self, request, *args, **kwargs):
