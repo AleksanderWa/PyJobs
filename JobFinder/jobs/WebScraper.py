@@ -1,3 +1,5 @@
+import json
+
 from bs4 import BeautifulSoup
 from collections import namedtuple
 from urllib.request import Request, urlopen
@@ -23,21 +25,24 @@ class Parser:
     def parse_url(self, data):
         soup = BeautifulSoup(data, features="html.parser")
         # elements = soup.findAll("li", class_="results__list-container-item")
-        elements = soup.find_all("li", "results__list-container-item")
+        elements = soup.find_all("script", type="application/ld+json")
         print(len(elements))
         # print(elements)
 
         for offer in elements:
+            # print(f"OFFER : {offer.get_text()}")
+            y = json.loads(offer.get_text())
+            print(f"JSON : {y['title']}")
             # print(offer)
-            offer_name = offer.find("h3", class_="offer-details__title")
-            company = offer.find("p", class_="offer-company")
-            publication_date = offer.find("span", class_="offer-actions__date")
-            offer_text = offer.find("span", class_="offer-description__content")
+            # offer_name = offer.find("h3", class_="offer-details__title")
+            # company = offer.find("p", class_="offer-company")
+            # publication_date = offer.find("span", class_="offer-actions__date")
+            # offer_text = offer.find("span", class_="offer-description__content")
 
-            offer_name = self.remove_empty_lines_from_html(offer_name)
-            company = self.remove_empty_lines_from_html(company)
-            publication_date = self.remove_empty_lines_from_html(publication_date)
-            offer_text = self.remove_empty_lines_from_html(offer_text)
+            # offer_name = self.remove_empty_lines_from_html(offer_name)
+            # company = self.remove_empty_lines_from_html(company)
+            # publication_date = self.remove_empty_lines_from_html(publication_date)
+            # offer_text = self.remove_empty_lines_from_html(offer_text)
 
             # Offer.objects.get_or_create(
             #     name=offer_name,
@@ -65,10 +70,13 @@ class Parser:
 
         print(f"URL : {url}")
         req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        webpage = urlopen(req).read()
+        with urlopen(req) as response:
+            readable_data = self.parse_url(response)
+            webpage = response.read()
+        # webpage = urlopen(req).read()
         print(webpage)
-        r = requests.post(url=url, headers=self.headers)
-        readable_data = self.parse_url(r.content)
+        # r = requests.post(url=url, headers=self.headers)
+        # readable_data = self.parse_url(r.content)
         return readable_data
 
     def remove_empty_lines_from_html(self, html_code):
