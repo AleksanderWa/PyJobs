@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.contrib.auth.models import User, Group
+from django.views.generic import View
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -15,12 +15,16 @@ class JobsViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
 
-
         parser = Parser()
-        jobs = ["Python"]
-        parser.get_data_from_pracuj_pl("Szczecin", *jobs)
+        jobs = ["full stack"]
+        jobs_pracuj = parser.get_data_from_pracuj_pl("Szczecin", *jobs)
 
         queryset = Offer.objects.all()
 
         serializer = OfferSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return Response(jobs_pracuj)
+
+
+class MainPageView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "pages/front-end-render.html", {})
