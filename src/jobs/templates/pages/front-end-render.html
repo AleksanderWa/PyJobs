@@ -5,30 +5,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Custom CSS -->
-    {% comment "Load your css like so" %}
-      <link rel="stylesheet" href="{% static 'css/my/app/app.css' %}">
-    {% endcomment %}
-
-
+      {% include 'pages/base_headers.html' %}
     <title>Hello, world!</title>
   </head>
   <body>
     <h1>Hello, world!</h1>
 
+    <div id="root">not rendered</div>
+    
+    <script src="{% static 'js/app.js' %}"></script>
+    <script>
+      const App = () => {
+  return React.createElement(
+  "div",
+  {},
+  React.createElement("h1", {}, "Rendered")
+  );
+};
 
-
-     <!-- Your FrontEnd JS Code -->
-     {% comment "Below is an example of how you might render your Angular/React/Vue front-end framework code" %}
-        <script src="{% static 'js/my/app/app.js' %}"></script>
-        <div id="root">not rendered</div>
-        <script src="{% https://unpkg.com/react@16.8.4/umd/react.development.js %}"></script>
-        <script src="{% https://unpkg.com/react-dom@16.8.4/umd/react-dom.development.js %}"></script>
-        <script>
-
-        </script>
-    {% endcomment %}
-
+ReactDOM.render(
+  React.createElement(App),
+  document.getElementById("root")
+);
+    </script>
 
 
   </body>

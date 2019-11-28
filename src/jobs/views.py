@@ -16,7 +16,7 @@ class JobsViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
 
         parser = Parser()
-        jobs = ["full stack"]
+        jobs = ["full%20stack"]
         jobs_pracuj = parser.get_data_from_pracuj_pl("Szczecin", *jobs)
 
         queryset = Offer.objects.all()
