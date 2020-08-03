@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from .models import Offer
 from .serializer import OfferSerializer
 from .WebScraper import Parser
+
+
 class JobsViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.

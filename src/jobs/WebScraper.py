@@ -1,12 +1,13 @@
 import json
+from pprint import pprint
 
 from bs4 import BeautifulSoup
 from collections import namedtuple
 from urllib.request import Request, urlopen
 import logging
-import requests
 
-from .models import Offer
+# from .models import Offer
+from jobs.models import Offer
 
 
 class Parser:
@@ -17,12 +18,14 @@ class Parser:
     PARAMS = namedtuple('Params', 'kw wp kw_sep')
     qr_params = PARAMS(';kw', ';wp', '-x44-')
 
-    def parse_url(self, data):
-        soup = BeautifulSoup(data, features="html.parser")
+    def parse_url(self, response):
+        soup = BeautifulSoup(response, features="lxml")
         elements = soup.find_all("script", type="application/ld+json")
         print(len(elements))
+        # breakpoint()
+        # return True
         response_data = [
-            self.create_job_json_ob(json.loads(offer.get_text())) for offer in elements
+            self.create_job_json_ob(json.loads(offer.contents[0])) for offer in elements
         ]
         return response_data
 
@@ -70,6 +73,8 @@ class Parser:
             'city': location,
         }
         return json_obj
+#
+#
 # parser = Parser()
 # jobs = ["python"]
-# parser.get_data_from_pracuj_pl("poznan", *jobs)
+# pprint(parser.get_data_from_pracuj_pl("gdansk", *jobs))
